@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#063f6f">
+  <meta name="description" content="Solicitação e acompanhamento de retirada de materiais da manutenção.">
+  <title>Almox • Materiais da Manutenção</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Ir para o conteúdo</a>
+
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+  <div id="login-screen" class="login-screen">
+    <section class="login-card" aria-labelledby="login-title">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">AM</div>
+        <div>
+          <p class="eyebrow">MANUTENÇÃO • ALMOXARIFADO</p>
+          <h1 id="login-title">Retirada de materiais</h1>
+        </div>
+      </div>
+      <p class="login-copy">Solicite, acompanhe e confirme a separação dos materiais em um só lugar.</p>
+      <form id="login-form" class="stack-form">
+        <label>Seu nome
+          <input id="login-name" name="name" autocomplete="name" required placeholder="Ex.: João da Silva">
+        </label>
+        <fieldset>
+          <legend>Como deseja entrar?</legend>
+          <div class="segmented" role="radiogroup" aria-label="Perfil de acesso">
+            <label><input type="radio" name="role" value="requester" checked><span>Solicitante</span></label>
+            <label><input type="radio" name="role" value="admin"><span>Almoxarifado</span></label>
+          </div>
+        </fieldset>
+        <label id="pin-wrap" class="hidden">PIN do almoxarifado
+          <input id="login-pin" name="pin" type="password" inputmode="numeric" maxlength="8" placeholder="••••">
+          <small>Na demonstração inicial, use <strong>2468</strong>. Altere nas configurações.</small>
+        </label>
+        <button class="btn btn-primary btn-lg" type="submit">Entrar no sistema</button>
+      </form>
+      <p class="privacy-note">Os dados deste protótipo ficam neste navegador. Exporte um backup antes de trocar de dispositivo.</p>
+    </section>
+    <aside class="login-visual" aria-label="Resumo do sistema">
+      <div class="visual-content">
+        <span class="status-orb"><i></i> Fluxo rastreável</span>
+        <h2>Do pedido à retirada,<br>sem perder o histórico.</h2>
+        <div class="mini-flow">
+          <div><span>1</span><p><b>Solicitado</b><small>Materiais e quantidades</small></p></div>
+          <i></i>
+          <div><span>2</span><p><b>Separado</b><small>Confirmação restrita</small></p></div>
+          <i></i>
+          <div><span>3</span><p><b>Entregue</b><small>Registro permanente</small></p></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="icon-btn mobile-only" id="menu-button" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <a href="#dashboard" class="brand-link" data-nav="dashboard" aria-label="Início">
+          <span class="brand-mark small">AM</span>
+          <span><b>Almox</b><small>Materiais da manutenção</small></span>
+        </a>
+        <div class="top-actions">
+          <button id="install-button" class="btn btn-ghost hidden">Instalar app</button>
+          <button id="new-request-top" class="btn btn-primary" data-open-request>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            <span>Nova solicitação</span>
+          </button>
+          <button id="profile-button" class="profile-button" aria-haspopup="true" aria-expanded="false">
+            <span id="profile-avatar">KS</span>
+            <span class="desktop-only"><b id="profile-name">Usuário</b><small id="profile-role">Solicitante</small></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg>
+          </button>
+          <div id="profile-menu" class="profile-menu hidden" role="menu">
+            <button id="switch-profile" role="menuitem">Trocar perfil</button>
+            <button id="logout-button" role="menuitem">Sair</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside id="sidebar" class="sidebar">
+        <nav aria-label="Menu principal">
+          <p class="nav-label">OPERAÇÃO</p>
+          <a href="#dashboard" data-nav="dashboard" class="nav-item active">
+            <svg viewBox="0 0 24 24"><path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-16v4h6V4h-6Z"/></svg>
+            Visão geral
+          </a>
+          <a href="#requests" data-nav="requests" class="nav-item">
+            <svg viewBox="0 0 24 24"><path d="M7 3h10v4H7V3ZM5 5H3v16h18V5h-2M7 12h10M7 16h7"/></svg>
+            Solicitações <span id="pending-badge" class="nav-badge">0</span>
+          </a>
+          <a href="#history" data-nav="history" class="nav-item">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg>
+            Histórico
+          </a>
+          <p class="nav-label admin-only">GESTÃO</p>
+          <a href="#reports" data-nav="reports" class="nav-item admin-only">
+            <svg viewBox="0 0 24 24"><path d="M5 20V10m7 10V4m7 16v-7"/></svg>
+            Relatórios
+          </a>
+          <a href="#settings" data-nav="settings" class="nav-item admin-only">
+            <svg viewBox="0 0 24 24"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+            Configurações
+          </a>
+        </nav>
+        <div class="sidebar-card">
+          <span class="online-dot"></span>
+          <div><b>Dados sincronizados</b><small id="storage-mode-label">Neste dispositivo</small></div>
+        </div>
+      </aside>
+      <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
+
+      <main id="main" class="main" tabindex="-1">
+        <section id="view-dashboard" class="view active" data-view="dashboard">
+          <div class="page-head">
+            <div><p class="eyebrow">PAINEL OPERACIONAL</p><h1>Olá, <span id="welcome-name">usuário</span></h1><p>Acompanhe as solicitações e veja o que precisa de atenção.</p></div>
+            <button class="btn btn-primary" data-open-request><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova solicitação</button>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card amber"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 7v5l3 2M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9Z"/></svg></div><div><span>Aguardando</span><strong id="stat-waiting">0</strong><small>pedidos na fila</small></div></article>
+            <article class="stat-card blue"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 7 10 17l-5-5"/></svg></div><div><span>Separados</span><strong id="stat-separated">0</strong><small>prontos para retirada</small></div></article>
+            <article class="stat-card green"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="m7 13 3 3 7-8M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z"/></svg></div><div><span>Entregues</span><strong id="stat-delivered">0</strong><small>concluídos no mês</small></div></article>
+            <article class="stat-card slate"><div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 0 1 2 2v15H3V6a2 2 0 0 1 2-2Z"/></svg></div><div><span>Tempo médio</span><strong id="stat-average">—</strong><small>até a separação</small></div></article>
+          </div>
+          <div class="dashboard-grid">
+            <section class="panel queue-panel">
+              <div class="panel-head"><div><h2>Fila de solicitações</h2><p>Pedidos mais recentes e seu andamento</p></div><a href="#requests" data-nav="requests" class="text-link">Ver todas <span>→</span></a></div>
+              <div id="dashboard-list" class="request-list"></div>
+            </section>
+            <aside class="panel quick-panel">
+              <div class="panel-head"><div><h2>Acesso rápido</h2><p>Ações frequentes</p></div></div>
+              <button class="quick-action" data-open-request><span class="quick-icon navy">+</span><span><b>Nova solicitação</b><small>Adicionar materiais</small></span><i>→</i></button>
+              <button class="quick-action" data-nav="history"><span class="quick-icon pale">↺</span><span><b>Consultar histórico</b><small>Pesquisar pedidos anteriores</small></span><i>→</i></button>
+              <button class="quick-action admin-only" id="quick-export"><span class="quick-icon mint">⇩</span><span><b>Exportar planilha</b><small>Gerar arquivo CSV</small></span><i>→</i></button>
+              <div class="tip-card"><span>i</span><p><b>Dica operacional</b>Confirme como “Separado” somente quando todos os itens disponíveis estiverem prontos para retirada.</p></div>
+            </aside>
+          </div>
+        </section>
+
+        <section id="view-requests" class="view" data-view="requests">
+          <div class="page-head"><div><p class="eyebrow">ACOMPANHAMENTO</p><h1>Solicitações</h1><p>Visualize e atualize a fila de separação.</p></div><button class="btn btn-primary" data-open-request><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova solicitação</button></div>
+          <div class="toolbar panel">
+            <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="request-search" placeholder="Buscar por atividade, OS, solicitante ou material"></div>
+            <select id="request-status-filter" aria-label="Filtrar por status"><option value="all">Todos os status</option><option value="Aguardando">Aguardando</option><option value="Em separação">Em separação</option><option value="Separado">Separado</option><option value="Entregue">Entregue</option><option value="Cancelado">Cancelado</option></select>
+            <select id="request-priority-filter" aria-label="Filtrar por prioridade"><option value="all">Todas as prioridades</option><option value="Urgente">Urgente</option><option value="Normal">Normal</option><option value="Programada">Programada</option></select>
+          </div>
+          <div id="requests-grid" class="requests-grid"></div>
+          <div id="requests-empty" class="empty-state hidden"><span>⌕</span><h2>Nenhuma solicitação encontrada</h2><p>Ajuste os filtros ou crie uma nova solicitação.</p></div>
+        </section>
+
+        <section id="view-history" class="view" data-view="history">
+          <div class="page-head"><div><p class="eyebrow">RASTREABILIDADE</p><h1>Histórico</h1><p>Registro completo, com origem SAP/CD por material.</p></div><button class="btn btn-secondary" id="history-export"><svg viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></svg>Exportar CSV</button></div>
+          <div class="toolbar panel history-toolbar">
+            <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="history-search" placeholder="Pesquisar no histórico"></div>
+            <label class="check-filter"><input id="filter-sap" type="checkbox"><span>SAP</span></label>
+            <label class="check-filter"><input id="filter-cd" type="checkbox"><span>CD</span></label>
+            <input id="history-from" type="date" aria-label="Data inicial">
+            <input id="history-to" type="date" aria-label="Data final">
+            <button id="clear-history-filters" class="btn btn-ghost">Limpar</button>
+          </div>
+          <div class="table-wrap panel">
+            <table>
+              <thead><tr><th>Solicitação</th><th>Atividade / OS</th><th>Solicitante</th><th>Materiais</th><th>Origem</th><th>Status</th><th>Atualização</th><th><span class="sr-only">Ações</span></th></tr></thead>
+              <tbody id="history-body"></tbody>
+            </table>
+            <div id="history-empty" class="empty-state hidden"><span>≡</span><h2>Histórico vazio</h2><p>As movimentações aparecerão aqui.</p></div>
+          </div>
+        </section>
+
+        <section id="view-reports" class="view admin-only" data-view="reports">
+          <div class="page-head"><div><p class="eyebrow">INDICADORES</p><h1>Relatórios</h1><p>Resumo operacional gerado a partir do histórico.</p></div><button class="btn btn-secondary" id="reports-export">Exportar dados</button></div>
+          <div class="report-grid">
+            <article class="panel report-card"><div class="panel-head"><div><h2>Solicitações por status</h2><p>Distribuição atual</p></div></div><div id="status-bars" class="bars"></div></article>
+            <article class="panel report-card"><div class="panel-head"><div><h2>Origem dos materiais</h2><p>Classificação SAP x compra direta</p></div></div><div id="source-donut" class="donut-wrap"></div></article>
+            <article class="panel report-card full"><div class="panel-head"><div><h2>Atividade recente</h2><p>Últimas atualizações registradas</p></div></div><div id="audit-list" class="audit-list"></div></article>
+          </div>
+        </section>
+
+        <section id="view-settings" class="view admin-only" data-view="settings">
+          <div class="page-head"><div><p class="eyebrow">ADMINISTRAÇÃO</p><h1>Configurações</h1><p>Integrações, segurança local e cópia de dados.</p></div></div>
+          <div class="settings-grid">
+            <form id="m365-form" class="panel settings-card">
+              <div class="settings-icon data">M</div><div><h2>Histórico compartilhado no Microsoft 365</h2><p>Conecte o site ao Workflow que grava e consulta a lista do SharePoint.</p></div>
+              <label>URL da API do Workflow<input id="m365-api-url" type="url" placeholder="https://prod-...logic.azure.com/..." autocomplete="off"></label>
+              <label class="toggle-row"><span><b>Usar dados compartilhados</b><small>Sincronizar solicitações entre os dispositivos</small></span><input id="m365-enabled" type="checkbox" role="switch"></label>
+              <div class="inline-actions"><button type="submit" class="btn btn-primary">Salvar conexão</button><button type="button" id="sync-m365" class="btn btn-secondary">Sincronizar agora</button></div>
+              <small class="security-warning">A lista corporativa já foi preparada. A URL é mantida somente neste navegador e não é publicada no código.</small>
+            </form>
+            <form id="teams-form" class="panel settings-card">
+              <div class="settings-icon teams">T</div><div><h2>Notificação no Teams</h2><p>Informe a URL do Workflow “Quando uma solicitação de webhook do Teams for recebida”.</p></div>
+              <label>URL do Workflow<input id="teams-webhook" type="url" placeholder="https://prod-...logic.azure.com/..." autocomplete="off"></label>
+              <label class="toggle-row"><span><b>Enviar automaticamente</b><small>Na criação e em cada mudança de status</small></span><input id="teams-enabled" type="checkbox" role="switch"></label>
+              <div class="inline-actions"><button type="submit" class="btn btn-primary">Salvar integração</button><button type="button" id="test-teams" class="btn btn-secondary">Testar</button></div>
+              <small class="security-warning">Para produção, proteja a URL em uma função de servidor. No modo local ela fica armazenada neste navegador.</small>
+            </form>
+            <form id="security-form" class="panel settings-card">
+              <div class="settings-icon lock">⌁</div><div><h2>Acesso do almoxarifado</h2><p>Altere o PIN usado para exibir controles restritos.</p></div>
+              <label>PIN atual<input id="current-pin" type="password" inputmode="numeric" required></label>
+              <label>Novo PIN<input id="new-pin" type="password" inputmode="numeric" minlength="4" maxlength="8" required></label>
+              <label>Confirmar novo PIN<input id="confirm-pin" type="password" inputmode="numeric" minlength="4" maxlength="8" required></label>
+              <button class="btn btn-primary" type="submit">Alterar PIN</button>
+            </form>
+            <section class="panel settings-card full">
+              <div class="settings-icon data">⇄</div><div><h2>Dados e backup</h2><p>Exporte tudo em JSON ou restaure uma cópia anterior.</p></div>
+              <div class="data-summary"><div><strong id="settings-requests-count">0</strong><span>solicitações</span></div><div><strong id="settings-events-count">0</strong><span>eventos de auditoria</span></div><div><strong id="settings-size">0 KB</strong><span>armazenados</span></div></div>
+              <div class="inline-actions"><button id="export-json" class="btn btn-secondary" type="button">Exportar backup</button><label class="btn btn-secondary file-button">Importar backup<input id="import-json" type="file" accept="application/json"></label><button id="reset-demo" class="btn btn-danger" type="button">Restaurar demonstração</button></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="request-dialog" class="modal">
+    <form id="request-form" method="dialog">
+      <div class="modal-head"><div><p class="eyebrow">NOVA SOLICITAÇÃO</p><h2>Retirada de materiais</h2><p>Preencha os dados e adicione quantos itens forem necessários.</p></div><button type="button" class="icon-btn" data-close-modal aria-label="Fechar"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <div class="modal-body">
+        <div class="form-section"><div class="section-title"><span>1</span><div><h3>Dados da atividade</h3><p>Identificação do serviço e responsáveis</p></div></div>
+          <div class="form-grid">
+            <label>Solicitante *<input id="req-requester" name="requester" required></label>
+            <label>Executante *<input id="req-executor" name="executor" required placeholder="Quem fará a retirada"></label>
+            <label class="span-2">Atividade *<input id="req-activity" name="activity" required placeholder="Ex.: Troca de rolamentos do elevador 20"></label>
+            <label>Número da OS<input id="req-os" name="os" placeholder="Ex.: 45001234"></label>
+            <label>Tipo de solicitação *<select id="req-type" name="type" required><option value="">Selecione</option><option>Verificação e separação</option><option>Retirada imediata</option><option>Programada</option></select></label>
+            <label>Prioridade *<select id="req-priority" name="priority" required><option>Normal</option><option>Urgente</option><option>Programada</option></select></label>
+            <label>Necessário até *<input id="req-needed" name="needed" type="datetime-local" required></label>
+          </div>
+        </div>
+        <div class="form-section"><div class="section-title with-action"><span>2</span><div><h3>Materiais</h3><p>Separe quantidade, unidade e descrição</p></div><button id="add-item" type="button" class="btn btn-secondary"><b>+</b> Adicionar linha</button></div>
+          <div class="materials-head" aria-hidden="true"><span>Qtd.</span><span>Un.</span><span>Descrição do material</span><span>Código SAP</span><span>Origem</span><span></span></div>
+          <div id="materials-rows" class="materials-rows"></div>
+          <template id="material-row-template"><div class="material-row"><label><span class="mobile-label">Quantidade</span><input class="item-qty" type="number" min="0.001" step="0.001" required placeholder="1"></label><label><span class="mobile-label">Unidade</span><select class="item-unit" required><option>UN</option><option>PC</option><option>KG</option><option>L</option><option>M</option><option>CX</option><option>JG</option></select></label><label><span class="mobile-label">Descrição</span><input class="item-description" required placeholder="Descrição completa do material"></label><label><span class="mobile-label">Código SAP</span><input class="item-code" inputmode="numeric" placeholder="Opcional"></label><label><span class="mobile-label">Origem</span><select class="item-source"><option value="Pendente">A definir</option><option value="SAP">SAP</option><option value="CD">CD</option></select></label><button type="button" class="remove-item icon-btn danger" aria-label="Remover material"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-8 0 1 14h8l1-14M10 11v6m4-6v6"/></svg></button></div></template>
+        </div>
+        <div class="form-section"><div class="section-title"><span>3</span><div><h3>Observações</h3><p>Informações importantes para a separação</p></div></div><label><span class="sr-only">Observações</span><textarea id="req-notes" rows="3" placeholder="Ex.: material para parada programada; verificar medida antes da separação..."></textarea></label></div>
+      </div>
+      <div class="modal-foot"><button type="button" class="btn btn-ghost" data-close-modal>Cancelar</button><button type="submit" class="btn btn-primary btn-lg"><svg viewBox="0 0 24 24"><path d="M20 7 10 17l-5-5"/></svg>Criar solicitação</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="detail-dialog" class="modal detail-modal">
+    <div id="detail-content"></div>
+  </dialog>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
