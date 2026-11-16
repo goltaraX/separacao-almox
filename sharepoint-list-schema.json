@@ -1,0 +1,11 @@
+{
+  "siteId": "ldcom365.sharepoint.com,6579f5d1-134a-46a4-af1c-712ee2f1b1cc,15799998-333a-4a21-9a0d-655cc4f87d27",
+  "listId": "ce06a920-7fb3-4ba9-b82c-fc1710cbdbd9",
+  "listName": "Almox - Solicitacoes Manutencao",
+  "columns": [
+    "SolicitacaoId", "Solicitante", "SolicitanteEmail", "Executante", "Atividade",
+    "NumeroOS", "TipoSolicitacao", "Prioridade", "NecessarioAte", "StatusSolicitacao",
+    "Observacoes", "DataSeparacao", "DataEntrega", "AtualizadoPor", "AtualizadoEm",
+    "ItemsJson", "HistoricoJson"
+  ]
+}
